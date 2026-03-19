@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section id="work" style="padding-top: 15rem;">
+    <h2 class="work-section-header">{{ category_title }}</h2>
+    <div class="work-grid">
+        {% if projects %}
+            {% for project in projects %}
+            <div class="work-item" 
+                 data-video-id="{{ project.video_id }}" 
+                 data-title="{{ project.title|e }}" 
+                 data-description="{{ project.description|e }}"
+                 onclick="handleItemClick(this)">
+                <div class="work-placeholder">
+                    {% if project.video_id %}
+                    <img src="https://img.youtube.com/vi/{{ project.video_id }}/hqdefault.jpg" style="width:100%; height:100%; object-fit:cover; opacity: 0.6;" alt="{{ project.title }}">
+                    {% endif %}
+                </div>
+                <div class="work-info">
+                    <div class="work-title">{{ project.title }}</div>
+                    <div class="work-year">{{ project.category }} | {{ project.year }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="work-item">
+                <div class="work-placeholder"></div>
+                <div class="work-info">
+                    <div class="work-title">Coming Soon...</div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

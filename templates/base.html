@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陳柏為 / Po Wei Chen {% if category_title %}- {{ category_title }}{% endif %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Outfit:wght@200;300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-primary: #ffffff;
+            --text-secondary: #999999;
+            --accent-color: #f1f1f1;
+            --header-height: 80px;
+            --padding-unit: 2rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Nav Bar */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: var(--header-height);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4rem;
+            z-index: 1000;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-logo a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 0.2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links div.work-nav {
+            position: relative;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-primary);
+        }
+
+        /* Hero Visual (Leading Visual) */
+        .main-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.4;
+            object-fit: cover;
+            filter: grayscale(100%) brightness(0.6);
+        }
+
+        /* Sections */
+        section {
+            padding: 10rem 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Hero Section (50/50 Split) */
+        .hero {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            min-height: 80vh;
+        }
+
+        .hero-image {
+            flex: 0.6;
+            max-width: 450px;
+            height: auto;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            max-height: 55vh;
+            object-fit: cover;
+            filter: grayscale(20%) brightness(0.9);
+            transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .hero-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .hero-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            font-weight: 200;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.3rem;
+        }
+
+        .hero-content .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Work Grid */
+        .work-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5rem;
+            margin-top: 4rem;
+        }
+
+        .work-section-header {
+            grid-column: 1 / -1;
+            font-size: 1.2rem;
+            font-weight: 200;
+            letter-spacing: 0.3rem;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .work-item {
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .work-item:hover {
+            opacity: 0.8;
+        }
+
+        .work-placeholder {
+            aspect-ratio: 16/9;
+            background-color: #333;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .work-placeholder::after {
+            content: "Play Video";
+            font-size: 0.8rem;
+            letter-spacing: 0.1rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .work-item:hover .work-placeholder::after {
+            opacity: 1;
+        }
+
+        .work-info {
+            text-align: left;
+        }
+
+        .work-title {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+            font-weight: 400;
+        }
+
+        .work-year {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Lightbox */
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #lightbox-content {
+            width: 95%;
+            max-width: 1400px;
+            display: flex;
+            background: #000;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        #lightbox-video {
+            flex: 2;
+            aspect-ratio: 16/9;
+            background: #000;
+        }
+
+        #lightbox-description {
+            flex: 1;
+            padding: 3rem;
+            color: var(--text-primary);
+            overflow-y: auto;
+            border-left: 1px solid #222;
+        }
+
+        #lightbox-description h2 {
+            font-size: 1.4rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            letter-spacing: 0.2rem;
+        }
+
+        #lightbox-description p {
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-weight: 200;
+        }
+
+        #lightbox iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .close-lightbox {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 2001;
+        }
+
+        @media (max-width: 900px) {
+            nav { padding: 0 2rem; }
+            section { padding: 6rem 2rem; }
+            .hero { flex-direction: column; }
+            #lightbox-content { flex-direction: column; }
+            #lightbox-description { border-left: none; border-top: 1px solid #222; }
+        }
+    </style>
+</head>
+<body>
+
+    <img src="{{ url_for('static', filename='assets/IMG_9846.JPG') }}" class="main-background" alt="Leading Visual">
+
+    <nav>
+        <div class="nav-logo"><a href="/">陳柏為</a></div>
+        <div class="nav-links">
+            <div class="work-nav">
+                <a href="/" style="color: var(--text-primary); margin-right: 1.5rem;">WORK:</a>
+                <a href="/category/compositions" class="{% if category_title == 'Compositions' %}active{% endif %}">Compositions</a>
+                <a href="/category/session" class="{% if category_title == 'Session' %}active{% endif %}">Sessions</a>
+                <a href="/category/diary-video" class="{% if category_title == 'Diary Video' %}active{% endif %}">Diary Video</a>
+                <a href="/category/film" class="{% if category_title == 'Film' %}active{% endif %}">Film</a>
+                <a href="/category/commercial-projects" class="{% if category_title == 'Commercial Projects' %}active{% endif %}">Commercial Projects</a>
+            </div>
+            <a href="/#about">About</a>
+            <a href="/#contact">Contact</a>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <div id="lightbox" onclick="closeLightbox()">
+        <span class="close-lightbox">&times;</span>
+        <div id="lightbox-content" onclick="event.stopPropagation()">
+            <div id="lightbox-video">
+                <div id="player-container"></div>
+            </div>
+            <div id="lightbox-description">
+                <h2 id="lb-title"></h2>
+                <p id="lb-desc"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleItemClick(el) {
+            const vid = el.getAttribute('data-video-id');
+            const title = el.getAttribute('data-title');
+            const desc = el.getAttribute('data-description');
+            openLightbox(vid, title, desc);
+        }
+
+        function openLightbox(videoID, title, desc) {
+            if (!videoID) return;
+            const container = document.getElementById('player-container');
+            const lbTitle = document.getElementById('lb-title');
+            const lbDesc = document.getElementById('lb-desc');
+
+            container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoID}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            lbTitle.innerText = title || '';
+            lbDesc.innerText = desc || '';
+
+            document.getElementById('lightbox').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('player-container').innerHTML = '';
+            document.getElementById('lightbox').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+</body>
+</html>
