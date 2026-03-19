@@ -10,37 +10,52 @@ app = Flask(__name__)
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1f1xkopplbQyjRVKtPeS3P2XKxRVAIEHX_7vzEEICJjw/export?format=csv"
 
 def get_youtube_id(url):
-    """提取 YouTube 影片 ID"""
-    if "youtu.be/" in url:
-        return url.split("/")[-1]
-    if "/shorts/" in url:
-        return url.split("/shorts/")[-1].split("?")[0]
-    id_match = re.search(r'v=([^&]+)', url)
-    return id_match.group(1) if id_match else None
+    """提取 YouTube 影片 ID，支援多種 URL 格式"""
+    if not url: return None
+    url = url.strip()
+    # 如果已經是 11 位的 ID
+    if len(url) == 11 and re.match(r'^[a-zA-Z0-9_-]+$', url):
+        return url
+    
+    # 支援常見格式：watch?v=, youtu.be/, shorts/, embed/
+    patterns = [
+        r'v=([a-zA-Z0-9_-]{11})',
+        r'youtu\.be/([a-zA-Z0-9_-]{11})',
+        r'shorts/([a-zA-Z0-9_-]{11})',
+        r'embed/([a-zA-Z0-9_-]{11})'
+    ]
+    for p in patterns:
+        match = re.search(p, url)
+        if match:
+            return match.group(1)
+    return None
 
 def fetch_data():
     """從 Google Sheet 取得作品資料"""
     try:
         response = requests.get(SHEET_URL)
         response.raise_for_status()
-        content = response.content.decode('utf-8')
+        content = response.content.decode('utf-8-sig')
         csv_reader = csv.DictReader(io.StringIO(content))
         
         projects = []
         for row in csv_reader:
-            # 去除欄位名稱的空白並取得對應資料
-            row = {k.strip(): v for k, v in row.items()}
+            # 容錯處理：去除欄位名稱空白
+            row = {str(k).strip(): v for k, v in row.items() if k is not None}
             
             video_url = row.get('VideoID (YouTube ID)', '').strip()
             video_id = get_youtube_id(video_url)
             
-            projects.append({
-                "title": row.get('Title (標題)', '').strip(),
-                "video_id": video_id,
-                "description": row.get('Description (描述)', '').strip(),
-                "category": row.get('Category (分類)', '音樂').strip(),
-                "year": "2024" 
-            })
+            # 只有標題與影片 ID 都存在時才加入，避免空資料
+            title = row.get('Title (標題)', '').strip()
+            if title and video_id:
+                projects.append({
+                    "title": title,
+                    "video_id": video_id,
+                    "description": row.get('Description (描述)', '').strip(),
+                    "category": row.get('Category (分類)', '音樂').strip().lower(),
+                    "year": "2024" 
+                })
         return projects
     except Exception as e:
         print(f"Error fetching data: {e}")
