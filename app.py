@@ -13,6 +13,8 @@ def get_youtube_id(url):
     """提取 YouTube 影片 ID"""
     if "youtu.be/" in url:
         return url.split("/")[-1]
+    if "/shorts/" in url:
+        return url.split("/shorts/")[-1].split("?")[0]
     id_match = re.search(r'v=([^&]+)', url)
     return id_match.group(1) if id_match else None
 
@@ -46,12 +48,18 @@ def fetch_data():
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/category/<cat>')
+def category(cat):
     all_projects = fetch_data()
-    # 分類邏輯 (忽略大小寫與前後空白)
-    compositions = [p for p in all_projects if str(p.get('category') or '').lower().strip() == 'compositions']
-    sessions = [p for p in all_projects if str(p.get('category') or '').lower().strip() == 'session']
+    # 將網址的 '-' 轉回空格以便匹配 CSV
+    target_cat = cat.replace('-', ' ')
+    projects = [p for p in all_projects if str(p.get('category') or '').lower().strip() == target_cat.lower()]
     
-    return render_template('index.html', compositions=compositions, sessions=sessions)
+    # 顯示用的標題
+    title = cat.title().replace('-', ' ')
+    return render_template('category.html', projects=projects, category_title=title)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
